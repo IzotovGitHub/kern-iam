@@ -1,9 +1,9 @@
 version: "3.9"
-name: kern-iam-compose
+name: application
 services:
-  postgres:
-    image: postgres:latest # Use a specific, recent Postgres image version
-    container_name: kern-iam-postgres
+  database:
+    image: postgres:17 # Use a specific, recent Postgres image version
+    container_name: postgres
     environment:
       POSTGRES_USER: kern
       POSTGRES_PASSWORD: kern
@@ -13,6 +13,18 @@ services:
       - "5432:5432"
     networks:
       - back-end
+
+  kern-iam-node:
+    image: kern-iam:1.0-SNAPSHOT
+    ports:
+      - "8080-8082:8080"
+    networks:
+      - back-end
+    depends_on:
+      - database
+    deploy:
+      mode: replicated
+      replicas: 3
 networks:
   back-end:
     driver: bridge
