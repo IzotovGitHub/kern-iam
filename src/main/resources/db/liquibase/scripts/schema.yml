@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: izotov_a
+      changes:
+        - sql:
+            sql: "CREATE SCHEMA IF NOT EXISTS kerniam;"
