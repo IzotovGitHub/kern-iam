@@ -1,0 +1,18 @@
+version: "3.9"
+name: kern-iam-compose
+services:
+  postgres:
+    image: postgres:latest # Use a specific, recent Postgres image version
+    container_name: kern-iam-postgres
+    environment:
+      POSTGRES_USER: kern
+      POSTGRES_PASSWORD: kern
+      POSTGRES_DB: kern_iam # Optional: creates a default database on startup
+    ports:
+      # Maps port 5432 on your host to port 5432 in the container
+      - "5432:5432"
+    networks:
+      - back-end
+networks:
+  back-end:
+    driver: bridge

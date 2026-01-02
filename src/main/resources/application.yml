@@ -1,0 +1,15 @@
+server:
+  port: 8081
+  error:
+    include-binding-errors: ALWAYS
+    include-message: ALWAYS
+    include-stacktrace: ALWAYS
+    include-exception: true
+
+spring:
+  main:
+    banner-mode: off
+  web:
+    locale: en_US
+  application:
+    name: kern-iam

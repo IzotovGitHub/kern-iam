@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>izotov.kern.iam</groupId>
+    <artifactId>kern-iam</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <spring.boot.version>4.0.1</spring.boot.version>
+        <reactor.version>3.8.1</reactor.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${spring.boot.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring.boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <version>${reactor.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version> <!-- Use an appropriate version -->
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>izotov.kern.iam.KernIdentityAndAccessManagementApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <activation>
+                <property>
+                    <name>pg_version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.48.0</version>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>postgres:${pg_version}</name>
+                                    <alias>kern-iam-postgres</alias>
+                                    <run>
+                                        <containerNamePattern>%a-${pg_version}</containerNamePattern>
+                                        <env>
+                                            <POSTGRES_USER>kern</POSTGRES_USER>
+                                            <POSTGRES_PASSWORD>kern</POSTGRES_PASSWORD>
+                                            <POSTGRES_DB>kern_iam</POSTGRES_DB>
+                                        </env>
+                                        <ports>
+                                            <port>5432:5432</port>
+                                        </ports>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>10000</time>
+                                        </wait>
+                                        <log>
+                                            <prefix>Postgres:</prefix>
+                                            <color>green</color>
+                                        </log>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
