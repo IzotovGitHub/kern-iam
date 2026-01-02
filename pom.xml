@@ -8,12 +8,16 @@
     <artifactId>kern-iam</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.1</version>
+    </parent>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <spring.boot.version>4.0.1</spring.boot.version>
         <reactor.version>3.8.1</reactor.version>
     </properties>
 
@@ -21,14 +25,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${spring.boot.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -39,38 +41,32 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version> <!-- Use an appropriate version -->
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>izotov.kern.iam.KernIdentityAndAccessManagementApplication</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>docker</id>
-            <activation>
-                <property>
-                    <name>pg_version</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.11.0</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>izotov.kern.iam.KernIdentityAndAccessManagementApplication</mainClass>
+                                    <classifier>exec</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
@@ -100,8 +96,52 @@
                                         </log>
                                     </run>
                                 </image>
+                                <image>
+                                    <name>${project.artifactId}:${project.version}</name>
+                                    <alias>kern-iam-application</alias>
+                                    <build>
+                                        <contextDir>${project.basedir}</contextDir>
+                                        <dockerFile>${project.basedir}/Dockerfile</dockerFile>
+                                        <args>
+                                            <JAR_FILE>target/${project.artifactId}-${project.version}-exec.jar</JAR_FILE>
+                                        </args>
+                                        <tags>
+                                            <tag>${project.version}</tag>
+                                        </tags>
+                                    </build>
+                                    <run>
+                                        <containerNamePattern>${project.artifactId}-${project.version}
+                                        </containerNamePattern>
+                                        <dependsOn>
+                                            <container>kern-iam-postgres</container>
+                                        </dependsOn>
+                                        <ports>
+                                            <port>8080:8080</port>
+                                            <port>5005:5005</port>
+                                        </ports>
+                                        <!--<wait>
+                                            <log>kern identity and access management application started</log>
+                                            <time>20000</time>
+                                             <http>
+                                                <url>http://localhost:8080/actuator/health</url>
+                                                <method>GET</method>
+                                                <status>200</status>
+                                            </http>
+                                        </wait>
+                                        -->
+                                    </run>
+                                </image>
                             </images>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>docker-build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
