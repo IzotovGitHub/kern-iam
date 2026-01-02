@@ -23,8 +23,4 @@ spring:
   liquibase:
     enabled: true
     change-log: /db/liquibase/scripts/master.yml
-    liquibase-schema: public
     drop-first: false
-    user: kern
-    password: kern
-    url: ${spring.datasource.url}
