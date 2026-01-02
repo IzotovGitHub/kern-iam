@@ -17,7 +17,6 @@ public class LiquibaseConfig {
     @Value("${spring.liquibase.drop-first:false}")
     private boolean dropFirst;
     
-    
     @Bean
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
