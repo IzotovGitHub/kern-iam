@@ -75,6 +75,7 @@
         <profile>
             <id>docker</id>
             <properties>
+                <spring-boot.run.main-class>izotov.kern.iam.KernIdentityAndAccessManagementApplication</spring-boot.run.main-class>
                 <database.alias>kern-iam-postgres</database.alias>
                 <application.alias>kern-iam-application</application.alias>
             </properties>
@@ -90,12 +91,10 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>repackage</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>izotov.kern.iam.KernIdentityAndAccessManagementApplication</mainClass>
                                     <classifier>exec</classifier>
                                 </configuration>
                             </execution>
@@ -141,10 +140,6 @@
                                     <build>
                                         <contextDir>${project.basedir}</contextDir>
                                         <dockerFile>${project.basedir}/Dockerfile</dockerFile>
-                                        <args>
-                                            <JAR_FILE>target/${project.artifactId}-${project.version}-exec.jar
-                                            </JAR_FILE>
-                                        </args>
                                         <tags>
                                             <tag>${project.version}</tag>
                                         </tags>
