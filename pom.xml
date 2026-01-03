@@ -33,6 +33,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <version>${reactor.version}</version>
@@ -163,7 +167,7 @@
                                         <links>
                                             <link>${database.alias}</link>
                                         </links>
-                                        <!--<wait>
+                                        <wait>
                                             <log>kern identity and access management application started</log>
                                             <time>20000</time>
                                              <http>
@@ -172,7 +176,6 @@
                                                 <status>200</status>
                                             </http>
                                         </wait>
-                                        -->
                                     </run>
                                 </image>
                             </images>

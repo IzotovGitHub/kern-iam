@@ -24,3 +24,12 @@ spring:
     enabled: true
     change-log: /db/liquibase/scripts/master.yml
     drop-first: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
