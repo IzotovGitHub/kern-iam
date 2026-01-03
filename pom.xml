@@ -74,6 +74,10 @@
     <profiles>
         <profile>
             <id>docker</id>
+            <properties>
+                <database.alias>kern-iam-postgres</database.alias>
+                <application.alias>kern-iam-application</application.alias>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -102,10 +106,12 @@
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>0.48.0</version>
                         <configuration>
+                            <outputFile>log/docker.log</outputFile>
+                            <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                             <images>
                                 <image>
                                     <name>postgres:${pg_version}</name>
-                                    <alias>kern-iam-postgres</alias>
+                                    <alias>${database.alias}</alias>
                                     <run>
                                         <containerNamePattern>%a-${pg_version}</containerNamePattern>
                                         <env>
@@ -113,6 +119,9 @@
                                             <POSTGRES_PASSWORD>kern</POSTGRES_PASSWORD>
                                             <POSTGRES_DB>kern_iam</POSTGRES_DB>
                                         </env>
+                                        <network>
+                                            <mode>bridge</mode>
+                                        </network>
                                         <ports>
                                             <port>5432:5432</port>
                                         </ports>
@@ -128,12 +137,13 @@
                                 </image>
                                 <image>
                                     <name>${project.artifactId}:${project.version}</name>
-                                    <alias>kern-iam-application</alias>
+                                    <alias>${application.alias}</alias>
                                     <build>
                                         <contextDir>${project.basedir}</contextDir>
                                         <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                         <args>
-                                            <JAR_FILE>target/${project.artifactId}-${project.version}-exec.jar</JAR_FILE>
+                                            <JAR_FILE>target/${project.artifactId}-${project.version}-exec.jar
+                                            </JAR_FILE>
                                         </args>
                                         <tags>
                                             <tag>${project.version}</tag>
@@ -142,13 +152,22 @@
                                     <run>
                                         <containerNamePattern>${project.artifactId}-${project.version}
                                         </containerNamePattern>
-                                        <dependsOn>
-                                            <container>kern-iam-postgres</container>
-                                        </dependsOn>
+                                        <network>
+                                            <mode>bridge</mode>
+                                        </network>
+                                        <env>
+                                            <DB_HOST>${database.alias}-${pg_version}</DB_HOST>
+                                        </env>
                                         <ports>
                                             <port>8080:8080</port>
                                             <port>5005:5005</port>
                                         </ports>
+                                        <dependsOn>
+                                            <container>${database.alias}</container>
+                                        </dependsOn>
+                                        <links>
+                                            <link>${database.alias}</link>
+                                        </links>
                                         <!--<wait>
                                             <log>kern identity and access management application started</log>
                                             <time>20000</time>

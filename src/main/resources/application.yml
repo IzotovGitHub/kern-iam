@@ -14,7 +14,7 @@ spring:
   application:
     name: kern-iam
   datasource:
-    url: jdbc:postgresql://localhost:5432/kern_iam
+    url: jdbc:postgresql://${DB_HOST}:5432/kern_iam
     username: kern
     password: kern
     driver-class-name: org.postgresql.Driver
