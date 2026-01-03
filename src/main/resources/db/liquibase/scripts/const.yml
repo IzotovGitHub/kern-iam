@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - property:
+      name: schema
+      value: kerniam

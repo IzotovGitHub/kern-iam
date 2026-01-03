@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: izotov_a
+      changes:
+        - createTable:
+            schemaName: ${schema}
+            tableName: usr
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: username
+                  type: varchar (50)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - createIndex:
+            schemaName: ${schema}
+            tableName: usr
+            unique: true
+            indexName: idx_usr_username
+            columns:
+              - column:
+                  name: username
+

@@ -4,4 +4,4 @@ databaseChangeLog:
       author: izotov_a
       changes:
         - sql:
-            sql: "CREATE SCHEMA IF NOT EXISTS kerniam;"
+            sql: "CREATE SCHEMA IF NOT EXISTS ${schema};"

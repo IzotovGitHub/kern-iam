@@ -1,4 +1,10 @@
 databaseChangeLog:
   - include:
+      file: const.yml
+      relativeToChangelogFile: true
+  - include:
       file: schema.yml
+      relativeToChangelogFile: true
+  - include:
+      file: usr.yml
       relativeToChangelogFile: true
