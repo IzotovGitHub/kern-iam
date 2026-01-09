@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "spring.liquibase")
-public class LiquibaseConfigProperties {
+public class LiquibaseProperties {
     private boolean enabled;
     private String changeLog;
     private boolean dropFirst;

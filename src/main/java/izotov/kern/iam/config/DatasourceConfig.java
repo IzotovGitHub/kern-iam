@@ -3,7 +3,7 @@ package izotov.kern.iam.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.r2dbc.spi.ConnectionFactory;
-import izotov.kern.iam.config.poperties.JDBCDatasourceProperties;
+import izotov.kern.iam.config.poperties.JDBCProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 public class DatasourceConfig {
     
-    private final JDBCDatasourceProperties jdbcDatasourceProperties;
+    private final JDBCProperties jdbcProperties;
     
     @Bean
     public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
@@ -27,11 +27,11 @@ public class DatasourceConfig {
     @Bean
     public DataSource jdbcDataSource() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(jdbcDatasourceProperties.getUrl());
-        config.setUsername(jdbcDatasourceProperties.getUsername());
-        config.setPassword(jdbcDatasourceProperties.getPassword());
-        config.setDriverClassName(jdbcDatasourceProperties.getDriverClassName());
-        config.setMaximumPoolSize(jdbcDatasourceProperties.getHikari().getMaximumPoolSize());
+        config.setJdbcUrl(jdbcProperties.getUrl());
+        config.setUsername(jdbcProperties.getUsername());
+        config.setPassword(jdbcProperties.getPassword());
+        config.setDriverClassName(jdbcProperties.getDriverClassName());
+        config.setMaximumPoolSize(jdbcProperties.getHikari().getMaximumPoolSize());
         return DataSourceBuilder
                 .derivedFrom(new HikariDataSource(config))
                 .build();

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Getter
 @ConfigurationProperties(prefix = "spring.datasource")
-public class JDBCDatasourceProperties {
+public class JDBCProperties {
     private String url;
     private String username;
     private String password;
