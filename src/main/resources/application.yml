@@ -42,4 +42,4 @@ logging:
   level:
     com.zaxxer.hikari: WARN
     org.springframework.jdbc: WARN
-    org.springframework.boot.autoconfigure.jdbc: WARNk
+    org.springframework.boot.autoconfigure.jdbc: WARN
