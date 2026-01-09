@@ -29,6 +29,7 @@
         <reactor.version>3.8.1</reactor.version>
         <liquibase.version>5.0.1</liquibase.version>
         <jooq.version>3.19.29</jooq.version>
+        <dmp.version>0.48.0</dmp.version>
     </properties>
 
     <dependencies>
@@ -108,90 +109,51 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>${liquibase.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>update</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <searchPath>src/main/resources</searchPath>
-                    <propertyFile>db/liquibase/liquibase.properties</propertyFile>
-                    <changeLogFile>db/liquibase/scripts/master.yml</changeLogFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-codegen-maven</artifactId>
-                <version>${jooq.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <logging>INFO</logging>
-                    <jdbc>
-                        <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost:5432/${postgres.db}</url>
-                        <user>${postgres.user}</user>
-                        <password>${postgres.password}</password>
-                    </jdbc>
-                    <generator>
-                        <name>org.jooq.codegen.JavaGenerator</name>
-                        <database>
-                            <name>org.jooq.meta.postgres.PostgresDatabase</name>
-                            <includes>.*</includes>
-                            <inputSchema>kerniam</inputSchema>
-                        </database>
-
-                        <generate>
-                            <daos>false</daos>
-                            <pojos>true</pojos>
-                            <interfaces>true</interfaces>
-                            <immutablePojos>false</immutablePojos>
-                            <fluentSetters>false</fluentSetters>
-                            <javaTimeTypes>false</javaTimeTypes>
-                        </generate>
-
-                        <target>
-                            <packageName>izotov.kern.iam.jooq</packageName>
-                            <directory>${basedir}/src/main/java</directory>
-                        </target>
-                    </generator>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
-            <id>env</id>
+            <id>docker-build</id>
+            <properties>
+                <postgres.build.port>5433</postgres.build.port>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.48.0</version>
+                        <version>${dmp.version}</version>
                         <executions>
+                            <!-- Старт БД в докере до сборки -->
                             <execution>
                                 <id>postgres-start</id>
                                 <phase>validate</phase>
                                 <goals>
                                     <goal>start</goal>
                                 </goals>
+                                <configuration>
+                                    <images>
+                                        <image>
+                                            <name>postgres:${pg_version}</name>
+                                            <alias>${postgres.alias}</alias>
+                                            <run>
+                                                <containerNamePattern>${postgres.alias}-build</containerNamePattern>
+                                                <env>
+                                                    <POSTGRES_USER>${postgres.user}</POSTGRES_USER>
+                                                    <POSTGRES_PASSWORD>${postgres.password}</POSTGRES_PASSWORD>
+                                                    <POSTGRES_DB>${postgres.db}</POSTGRES_DB>
+                                                </env>
+                                                <ports>
+                                                    <port>${postgres.build.port}:5432</port>
+                                                </ports>
+                                                <wait>
+                                                    <log>database system is ready to accept connections</log>
+                                                    <time>10000</time>
+                                                </wait>
+                                            </run>
+                                        </image>
+                                    </images>
+                                </configuration>
                             </execution>
+                            <!-- Остановка докер контейнера с БД после сборки -->
                             <execution>
                                 <id>postgres-stop</id>
                                 <phase>install</phase>
@@ -199,16 +161,135 @@
                                     <goal>stop</goal>
                                 </goals>
                             </execution>
+
+                            <!-- Сборка образа krn-iam -->
+                            <execution>
+                                <id>build-kern-iam-image</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <images>
+                                        <image>
+                                            <name>${project.artifactId}:${project.version}</name>
+                                            <alias>${application.alias}</alias>
+                                            <build>
+                                                <contextDir>${project.basedir}</contextDir>
+                                                <dockerFile>${project.basedir}/Dockerfile</dockerFile>
+                                                <tags>
+                                                    <tag>${project.version}</tag>
+                                                </tags>
+                                            </build>
+                                        </image>
+                                    </images>
+                                </configuration>
+                            </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.liquibase</groupId>
+                        <artifactId>liquibase-maven-plugin</artifactId>
+                        <version>${liquibase.version}</version>
+                        <executions>
+                            <!-- Применение liquibase скриптов -->
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>update</goal>
+                                </goals>
+                                <configuration>
+                                    <url>jdbc:postgresql://localhost:${postgres.build.port}/${postgres.db}</url>
+                                    <username>${postgres.user}</username>
+                                    <password>${postgres.password}</password>
+                                    <driver>org.postgresql.Driver</driver>
+                                    <searchPath>src/main/resources</searchPath>
+                                    <changeLogFile>db/liquibase/scripts/master.yml</changeLogFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-codegen-maven</artifactId>
+                        <version>${jooq.version}</version>
+                        <executions>
+                            <!-- Генерация кода -->
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <logging>INFO</logging>
+                                    <jdbc>
+                                        <driver>org.postgresql.Driver</driver>
+                                        <url>jdbc:postgresql://localhost:${postgres.build.port}/${postgres.db}</url>
+                                        <user>${postgres.user}</user>
+                                        <password>${postgres.password}</password>
+                                    </jdbc>
+                                    <generator>
+                                        <name>org.jooq.codegen.JavaGenerator</name>
+                                        <database>
+                                            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                                            <includes>.*</includes>
+                                            <inputSchema>kerniam</inputSchema>
+                                        </database>
+
+                                        <generate>
+                                            <daos>false</daos>
+                                            <pojos>true</pojos>
+                                            <interfaces>true</interfaces>
+                                            <immutablePojos>false</immutablePojos>
+                                            <fluentSetters>false</fluentSetters>
+                                            <javaTimeTypes>false</javaTimeTypes>
+                                        </generate>
+                                        <target>
+                                            <packageName>izotov.kern.iam.jooq</packageName>
+                                            <directory>${basedir}/src/main/java</directory>
+                                        </target>
+                                    </generator>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <!-- Создание *-exec.jar -->
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>docker-env</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${dmp.version}</version>
                         <configuration>
-                            <outputFile>log/docker-postgres.log</outputFile>
+                            <outputFile>log/docker-env.log</outputFile>
                             <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                             <images>
                                 <image>
                                     <name>postgres:${pg_version}</name>
                                     <alias>${postgres.alias}</alias>
                                     <run>
-                                        <containerNamePattern>${postgres.alias}</containerNamePattern>
+                                        <containerNamePattern>${postgres.alias}-${pg_version}</containerNamePattern>
                                         <env>
                                             <POSTGRES_USER>${postgres.user}</POSTGRES_USER>
                                             <POSTGRES_PASSWORD>${postgres.password}</POSTGRES_PASSWORD>
@@ -238,36 +319,13 @@
         </profile>
 
         <profile>
-            <id>docker</id>
+            <id>docker-kern-iam</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>repackage</goal>
-                                </goals>
-                                <configuration>
-                                    <classifier>exec</classifier>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.48.0</version>
-                        <executions>
-                            <execution>
-                                <id>build-kern-iam-image</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <version>${dmp.version}</version>
                         <configuration>
                             <outputFile>log/docker-kern-iam.log</outputFile>
                             <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
@@ -275,13 +333,6 @@
                                 <image>
                                     <name>${project.artifactId}:${project.version}</name>
                                     <alias>${application.alias}</alias>
-                                    <build>
-                                        <contextDir>${project.basedir}</contextDir>
-                                        <dockerFile>${project.basedir}/Dockerfile</dockerFile>
-                                        <tags>
-                                            <tag>${project.version}</tag>
-                                        </tags>
-                                    </build>
                                     <run>
                                         <containerNamePattern>${project.artifactId}-${project.version}
                                         </containerNamePattern>
@@ -299,12 +350,12 @@
                                             <port>5005:5005</port>
                                         </ports>
                                         <dependsOn>
-                                            <container>${postgres.alias}</container>
+                                            <container>${postgres.alias}-${pg_version}</container>
                                         </dependsOn>
                                         <links>
-                                            <link>${postgres.alias}</link>
+                                            <link>${postgres.alias}-${pg_version}</link>
                                         </links>
-                                        <!--wait>
+                                        <wait>
                                             <log>kern identity and access management application started</log>
                                             <time>20000</time>
                                              <http>
@@ -312,7 +363,7 @@
                                                 <method>GET</method>
                                                 <status>200</status>
                                             </http>
-                                        </wait-->
+                                        </wait>
                                     </run>
                                 </image>
                             </images>
