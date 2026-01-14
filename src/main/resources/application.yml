@@ -13,6 +13,10 @@ spring:
     locale: en_US
   application:
     name: kern-iam
+  security:
+    user:
+      name: kernadmin
+      password: kernadmin
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST}:5432/${DB_NAME}
     username: ${DB_USER}
@@ -40,6 +44,9 @@ management:
 
 logging:
   level:
+    org.jooq.Constants: off
     com.zaxxer.hikari: WARN
     org.springframework.jdbc: WARN
     org.springframework.boot.autoconfigure.jdbc: WARN
+    izotov.kern.iam.dao.repo: DEBUG
+    izotov.kern.iam.webapi.controller: DEBUG
