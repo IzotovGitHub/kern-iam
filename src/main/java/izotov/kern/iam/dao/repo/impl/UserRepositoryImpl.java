@@ -23,8 +23,8 @@ public class UserRepositoryImpl implements UserRepository {
     public Flux<Usr> findUsers(Condition condition, Number offset, Number size) {
         log.debug("find {} users", size);
         return Flux.from(dsl.selectFrom(USR)
-                .where(condition)
-                .limit(offset, size))
+                        .where(condition)
+                        .limit(offset, size))
                 .map(record -> record.into(Usr.class));
     }
     
@@ -32,7 +32,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Mono<Long> count() {
         log.debug("user count");
         return Mono.from(dsl.select(DSL.count())
-                .from(USR))
+                        .from(USR))
                 .map(record -> record.value1().longValue());
     }
 }
