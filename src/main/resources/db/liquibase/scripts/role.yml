@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: izotov_a
+      changes:
+        - createTable:
+            schemaName: ${schema}
+            tableName: role
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: name
+                  type: varchar (50)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - createIndex:
+            schemaName: ${schema}
+            tableName: role
+            unique: true
+            indexName: idx_role_name
+            columns:
+              - column:
+                  name: name
+        - insert:
+            schemaName: ${schema}
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: 'ADMIN'
+        - insert:
+            schemaName: ${schema}
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: 'AUTHORIZED'
+        - insert:
+            schemaName: ${schema}
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: 'ANONYMOUS'
