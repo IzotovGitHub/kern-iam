@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: izotov_a
+      changes:
+        - createTable:
+            schemaName: ${schema}
+            tableName: usr_role
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: usr_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            schemaName: ${schema}
+            tableName: usr_role
+            indexName: idx_usr_role_usr_id
+            columns:
+              - column:
+                  name: usr_id
+        - createIndex:
+            schemaName: ${schema}
+            tableName: usr_role
+            indexName: idx_usr_role_role_id
+            columns:
+              - column:
+                  name: role_id
+
+        - addForeignKeyConstraint:
+            constraintName: fk_usr_role
+            baseTableSchemaName: ${schema}
+            baseTableName: usr_role
+            baseColumnNames: usr_id
+            referencedTableSchemaName: ${schema}
+            referencedTableName: usr
+            referencedColumnNames: uuid
+        - addForeignKeyConstraint:
+            constraintName: fk_role_usr
+            baseTableSchemaName: ${schema}
+            baseTableName: usr_role
+            baseColumnNames: role_id
+            referencedTableSchemaName: ${schema}
+            referencedTableName: role
+            referencedColumnNames: uuid
+
