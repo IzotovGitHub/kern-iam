@@ -21,6 +21,11 @@ databaseChangeLog:
                   constraints:
                     unique: true
                     nullable: false
+              - column:
+                  name: password
+                  type: varchar (255)
+                  constraints:
+                    nullable: false
         - createIndex:
             schemaName: ${schema}
             tableName: usr
