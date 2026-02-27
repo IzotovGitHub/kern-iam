@@ -13,9 +13,8 @@ spring:
     locale: en_US
   application:
     name: kern-iam
-  security:
-    user:
-      name: kernadmin
+    admin:
+      username: kernadmin
       password: kernadmin
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST}:5432/${DB_NAME}

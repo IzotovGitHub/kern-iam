@@ -7,6 +7,10 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository {
     
+    Mono<Usr> create(Usr user);
+    
+    Mono<Usr> findByUsername(String username);
+    
     Flux<Usr> findUsers(Condition condition, Number offset, Number size);
     
     Mono<Long> count();

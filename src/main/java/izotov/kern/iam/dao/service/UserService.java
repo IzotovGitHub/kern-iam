@@ -8,9 +8,13 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     
+    Mono<Boolean> exists(String username);
+    
     Flux<Usr> findUsers(Condition condition, Pageable pageable);
     
     Flux<Usr> findPageableUsers(Pageable pageable);
+    
+    Mono<Usr> create(Usr user);
     
     Mono<Long> count();
 }
