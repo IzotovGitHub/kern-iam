@@ -1,4 +1,4 @@
-package izotov.kern.iam.builder;
+package izotov.kern.iam.jooq.tables.builder;
 
 import izotov.kern.iam.jooq.tables.pojos.Usr;
 import lombok.AccessLevel;

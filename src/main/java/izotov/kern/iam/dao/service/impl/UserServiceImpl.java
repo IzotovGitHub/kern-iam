@@ -1,5 +1,6 @@
 package izotov.kern.iam.dao.service.impl;
 
+import izotov.kern.iam.dao.entity.KernUserRecord;
 import izotov.kern.iam.dao.repo.UserRepository;
 import izotov.kern.iam.dao.service.UserService;
 import izotov.kern.iam.jooq.tables.pojos.Usr;
@@ -36,17 +37,18 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     }
     
     @Override
-    public Flux<Usr> findUsers(Condition condition, Pageable pageable) {
-        return userRepository.findUsers(condition, pageable.getOffset(), pageable.getPageSize());
+    public Flux<KernUserRecord> findUsers(Condition condition, Pageable pageable) {
+        return userRepository.findUsers(condition, pageable.getOffset(), pageable.getPageSize())
+                .map(KernUserRecord::new);
     }
     
     @Override
-    public Flux<Usr> findPageableUsers(Pageable pageable) {
+    public Flux<KernUserRecord> findPageableUsers(Pageable pageable) {
         return findUsers(noCondition(), pageable);
     }
     
     @Override
-    public Mono<Usr> create(Usr user) {
+    public Mono<KernUserRecord> create(Usr user) {
         final String pwd = user.getPassword();
         if(Objects.isNull(pwd)) {
             // TODO Добавить выброс осмысленного исключения
@@ -55,7 +57,8 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
         
         String encodedPwd = encoder.encode(user.getPassword());
         user.setPassword(encodedPwd);
-        return userRepository.create(user);
+        return userRepository.create(user)
+                .map(KernUserRecord::new);
     }
     
     @Override
