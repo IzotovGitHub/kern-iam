@@ -1,17 +1,12 @@
 package izotov.kern.iam.dao.repo.impl;
 
-import izotov.kern.iam.dao.entity.KernUserRecord;
-import izotov.kern.iam.dao.entity.UserRoleRecord;
 import izotov.kern.iam.dao.repo.UserRoleRepository;
-import izotov.kern.iam.jooq.tables.pojos.Usr;
 import izotov.kern.iam.jooq.tables.pojos.UsrRole;
-import izotov.kern.iam.jooq.tables.records.UsrRecord;
 import izotov.kern.iam.jooq.tables.records.UsrRoleRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.SelectWhereStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
