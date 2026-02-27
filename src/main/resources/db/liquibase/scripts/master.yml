@@ -8,3 +8,9 @@ databaseChangeLog:
   - include:
       file: usr.yml
       relativeToChangelogFile: true
+  - include:
+      file: role.yml
+      relativeToChangelogFile: true
+  - include:
+      file: usr_role.yml
+      relativeToChangelogFile: true
