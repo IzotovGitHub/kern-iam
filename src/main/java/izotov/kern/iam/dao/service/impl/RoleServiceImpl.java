@@ -14,8 +14,8 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     
     @Override
-    public Mono<UserRoleRecord> find(UserRoleRecord.ERole role) {
-        return roleRepository.findByName(role.name())
+    public Mono<UserRoleRecord> findByName(String role) {
+        return roleRepository.findByName(role)
                 .switchIfEmpty(Mono.error(new Exception(""))) // TODO Добавить выброс осмысленного исключения
                 .map(UserRoleRecord::new);
     }

@@ -2,6 +2,8 @@ package izotov.kern.iam.dao.service.impl;
 
 import izotov.kern.iam.dao.entity.KernUserRecord;
 import izotov.kern.iam.dao.repo.UserRepository;
+import izotov.kern.iam.dao.repo.UserRoleRepository;
+import izotov.kern.iam.dao.service.UserRoleService;
 import izotov.kern.iam.dao.service.UserService;
 import izotov.kern.iam.jooq.tables.pojos.Usr;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static izotov.kern.iam.jooq.tables.Usr.USR;
 import static org.jooq.impl.DSL.noCondition;
@@ -28,6 +31,8 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
+    
+    private final UserRoleService userRoleService;
     
     @Override
     public Mono<Boolean> exists(String username) {
@@ -68,11 +73,24 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     
     @Override
     public Mono<UserDetails> findByUsername(String username) {
+        return findByUserName(username)
+                .zipWhen(userRoleService::findUserRoles)
+                .map(tuple -> {
+                    KernUserRecord user = tuple.getT1();
+                    Set<String> roles = tuple.getT2();
+                    return User.builder()
+                            .username(user.getUserName())
+                            .password(user.getPassword())
+                            .passwordEncoder(encoder::encode)
+                            .roles(roles.toArray(new String[0]))
+                            .build();
+                });
+    }
+    
+    private Mono<KernUserRecord> findByUserName(String username) {
         return userRepository.findByUsername(username)
-                .map(usr -> User.builder()
-                        .username(usr.getUsername())
-                        .password(usr.getPassword())
-                        .build());
+                .switchIfEmpty(Mono.error(new Exception("")))
+                .map(KernUserRecord::new);
     }
     
     

@@ -13,12 +13,6 @@ public record UserRoleRecord(Role role) {
     public String name() {
         return role.getName();
     }
-    
-    public enum ERole {
-        ADMIN,
-        AUTHORIZED,
-        ANONYMOUS
-    }
 }
 
 

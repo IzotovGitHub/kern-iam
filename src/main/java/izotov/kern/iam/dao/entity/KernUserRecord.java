@@ -13,4 +13,7 @@ public record KernUserRecord(Usr user) {
     public String getUserName() {
         return user.getUsername();
     }
+    public String getPassword() {
+        return user.getPassword();
+    }
 }

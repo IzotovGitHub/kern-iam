@@ -1,20 +1,16 @@
 package izotov.kern.iam.config;
 
-import izotov.kern.iam.dao.entity.UserRoleRecord;
 import izotov.kern.iam.dao.service.RoleService;
 import izotov.kern.iam.dao.service.UserRoleService;
-import izotov.kern.iam.jooq.tables.builder.UserBuilder;
 import izotov.kern.iam.dao.service.UserService;
+import izotov.kern.iam.dao.entity.builder.UserBuilder;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import static izotov.kern.iam.dao.entity.UserRoleRecord.ERole.ADMIN;
 
 @Slf4j
 @Configuration
@@ -37,7 +33,7 @@ public class DefaultUserConfig {
                         .setPassword(password)
                         .build())
                 .flatMap(userService::create)
-                .flatMap(admin -> roleService.find(ADMIN)
+                .flatMap(admin -> roleService.findByName("ADMIN")
                         .flatMap(role -> userRoleService.assign(admin, role))
                         .thenReturn(admin))
                 .subscribe(

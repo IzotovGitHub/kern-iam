@@ -1,5 +1,6 @@
 package izotov.kern.iam.dao.repo.impl;
 
+import izotov.kern.iam.dao.entity.UserRoleRecord;
 import izotov.kern.iam.dao.repo.UserRoleRepository;
 import izotov.kern.iam.jooq.tables.pojos.UsrRole;
 import izotov.kern.iam.jooq.tables.records.UsrRoleRecord;
@@ -7,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
+import org.jooq.SelectWhereStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -37,12 +40,25 @@ public class UserRoleRepositoryImpl implements UserRoleRepository {
     }
     
     @Override
-    public Mono<UsrRole> assign(UUID userId, UUID roleId) {
-        log.debug("assign: {} to {}", userId, roleId);
+    public Mono<UsrRole> assign(UUID userId, UserRoleRecord role) {
+        log.debug("assign: {} to {}", userId, role.name());
         return Mono.from(dsl.insertInto(USR_ROLE)
-                .set(USR_ROLE.USR_ID, userId)
-                .set(USR_ROLE.ROLE_ID, roleId)
+                        .set(USR_ROLE.USR_ID, userId)
+                        .set(USR_ROLE.ROLE_ID, role.getId())
+                        .set(USR_ROLE.ROLE_NAME, role.name())
                 .returning())
                 .map(USR_ROLE_MAPPER);
+    }
+    
+    @Override
+    public Flux<UsrRole> findUserRoles(UUID userId) {
+        log.debug("findUserRoles: {} ", userId);
+        return Flux.from(select()
+                .where(USR_ROLE.USR_ID.eq(userId)))
+                .map(USR_ROLE_MAPPER);
+    }
+    
+    private SelectWhereStep<UsrRoleRecord> select() {
+        return dsl.selectFrom(USR_ROLE);
     }
 }

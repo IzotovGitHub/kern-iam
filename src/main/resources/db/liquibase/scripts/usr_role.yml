@@ -25,6 +25,11 @@ databaseChangeLog:
                   type: uuid
                   constraints:
                     nullable: false
+              - column:
+                  name: role_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
 
         - createIndex:
             schemaName: ${schema}
