@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+import static izotov.kern.iam.security.ApiPathsConstants.OPEN_API;
+
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -25,10 +27,8 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable) // Отключаем CSRF для примера
                 .authorizeExchange(exchanges -> exchanges
                         // Разрешаем доступ к определенным путям
-                        .pathMatchers(
-                                "/actuator/health",
-                                "/kern/users"
-                        ).permitAll()
+                        .pathMatchers(OPEN_API.paths()).permitAll()
+                        // .pathMatchers(AUTHENTICATED_API.paths()).authenticated()
                         // Требуем авторизацию для всех остальных
                         .anyExchange()
                         .authenticated()

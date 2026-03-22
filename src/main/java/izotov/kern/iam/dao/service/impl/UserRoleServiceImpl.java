@@ -8,10 +8,8 @@ import izotov.kern.iam.jooq.tables.pojos.UsrRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,12 +23,12 @@ public class UserRoleServiceImpl implements UserRoleService {
     
     @Override
     public Mono<Void> assign(KernUserRecord user, UserRoleRecord role) {
-        UUID userId = user.getId();
+        UUID userId = user.id();
         UUID roleId = role.getId();
         return userRoleRepository.checkAccess(userId, roleId)
                 .doOnNext(hasAccess -> {
-                    if(hasAccess) {
-                        log.warn("User {} already has access {}", user.getUserName(), role.name());
+                    if (hasAccess) {
+                        log.warn("User {} already has access {}", user.username(), role.name());
                     }
                 })
                 .filter(hasAccess -> !hasAccess)
@@ -40,7 +38,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     
     @Override
     public Mono<Set<String>> findUserRoles(KernUserRecord user) {
-        return userRoleRepository.findUserRoles(user.getId())
+        return userRoleRepository.findUserRoles(user.id())
                 .map(UsrRole::getRoleName)
                 .collect(Collectors.toSet());
     }

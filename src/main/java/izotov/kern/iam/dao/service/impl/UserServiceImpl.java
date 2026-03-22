@@ -2,10 +2,16 @@ package izotov.kern.iam.dao.service.impl;
 
 import izotov.kern.iam.dao.entity.KernUserRecord;
 import izotov.kern.iam.dao.repo.UserRepository;
-import izotov.kern.iam.dao.repo.UserRoleRepository;
 import izotov.kern.iam.dao.service.UserRoleService;
 import izotov.kern.iam.dao.service.UserService;
+import izotov.kern.iam.exception.PasswordRequiredException;
+import izotov.kern.iam.exception.UserAlreadyExistsException;
+import izotov.kern.iam.exception.UserNotFoundException;
 import izotov.kern.iam.jooq.tables.pojos.Usr;
+import izotov.kern.iam.mapper.UserMapper;
+import izotov.kern.iam.webapi.dto.NewUserDto;
+import izotov.kern.iam.webapi.dto.UserCreatedDto;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jspecify.annotations.Nullable;
@@ -16,13 +22,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import java.util.Set;
 
-import static izotov.kern.iam.jooq.tables.Usr.USR;
 import static org.jooq.impl.DSL.noCondition;
 
 @Service
@@ -36,15 +42,23 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     
     @Override
     public Mono<Boolean> exists(String username) {
-        return findUsers(USR.USERNAME.endsWithIgnoreCase(username), Pageable.ofSize(1))
-                .collectList()
-                .map(resp -> !resp.isEmpty());
+        return findByUserName(username)
+                .thenReturn(true)
+                .onErrorReturn(UserNotFoundException.class, false);
     }
     
     @Override
     public Flux<KernUserRecord> findUsers(Condition condition, Pageable pageable) {
         return userRepository.findUsers(condition, pageable.getOffset(), pageable.getPageSize())
-                .map(KernUserRecord::new);
+                .map(UserMapper::toRecord);
+    }
+    
+    @Override
+    public Mono<KernUserRecord> findUser(Condition condition) {
+        return userRepository.findUsers(condition, 0, 1)
+                .next()
+                .switchIfEmpty(Mono.error(new UserNotFoundException(condition)))
+                .map(UserMapper::toRecord);
     }
     
     @Override
@@ -53,17 +67,27 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     }
     
     @Override
-    public Mono<KernUserRecord> create(Usr user) {
+    public Mono<UserCreatedDto> newUser(@NonNull @Validated NewUserDto user) {
+        return exists(user.username())
+                .flatMap(exists -> exists
+                        ? Mono.error(() -> new UserAlreadyExistsException(user))
+                        : Mono.empty())
+                .thenReturn(UserMapper.toPojo(user))
+                .flatMap(this::create)
+                .map(UserMapper::toUserCreated);
+    }
+    
+    private Mono<KernUserRecord> create(Usr user) {
         final String pwd = user.getPassword();
-        if(Objects.isNull(pwd)) {
-            // TODO Добавить выброс осмысленного исключения
-            return Mono.error(() -> new Exception(""));
+        
+        if (Objects.isNull(pwd)) {
+            return Mono.error(() -> new PasswordRequiredException("Password cannot be null"));
         }
         
         String encodedPwd = encoder.encode(user.getPassword());
         user.setPassword(encodedPwd);
         return userRepository.create(user)
-                .map(KernUserRecord::new);
+                .map(UserMapper::toRecord);
     }
     
     @Override
@@ -79,18 +103,19 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
                     KernUserRecord user = tuple.getT1();
                     Set<String> roles = tuple.getT2();
                     return User.builder()
-                            .username(user.getUserName())
-                            .password(user.getPassword())
+                            .username(user.username())
+                            .password(user.password())
                             .passwordEncoder(encoder::encode)
                             .roles(roles.toArray(new String[0]))
+                            .disabled(false)
                             .build();
                 });
     }
     
     private Mono<KernUserRecord> findByUserName(String username) {
         return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.error(new Exception("")))
-                .map(KernUserRecord::new);
+                .switchIfEmpty(Mono.error(new UserNotFoundException(username)))
+                .map(UserMapper::toRecord);
     }
     
     
