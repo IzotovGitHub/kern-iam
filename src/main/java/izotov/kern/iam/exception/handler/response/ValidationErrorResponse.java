@@ -18,7 +18,6 @@ public class ValidationErrorResponse extends ErrorResponse {
     public record Error(
             String code,
             String field,
-            Object rejectedValue,
             String message) {
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import izotov.kern.iam.dao.service.UserService;
 import izotov.kern.iam.exception.handler.response.ErrorResponse;
 import izotov.kern.iam.exception.handler.response.ValidationErrorResponse;
@@ -25,12 +26,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Validated
 @RestController
+@Tag(name = "user")
+@RequestMapping("/kern/v1")
 @RequiredArgsConstructor
 public class UserController {
     
     private final UserService userService;
     
-    @GetMapping("/kern/users")
+    @GetMapping("/users")
     @Operation(summary = "Get user list")
     @ApiResponses(
             @ApiResponse(
@@ -49,7 +52,7 @@ public class UserController {
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
     
-    @PostMapping("/kern/user/create")
+    @PostMapping("/user/create")
     @Operation(summary = "Create new user")
     @ApiResponses({
             @ApiResponse(

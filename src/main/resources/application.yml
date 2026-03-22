@@ -15,7 +15,7 @@ spring:
     name: kern-iam
     admin:
       username: kernadmin
-      password: kernadmin
+      password: changeit
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST}:5432/${DB_NAME}
     username: ${DB_USER}

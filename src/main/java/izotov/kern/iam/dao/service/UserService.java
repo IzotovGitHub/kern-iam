@@ -3,6 +3,8 @@ package izotov.kern.iam.dao.service;
 import izotov.kern.iam.dao.entity.KernUserRecord;
 import izotov.kern.iam.webapi.dto.NewUserDto;
 import izotov.kern.iam.webapi.dto.UserCreatedDto;
+import jakarta.validation.Valid;
+import lombok.NonNull;
 import org.jooq.Condition;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
@@ -18,7 +20,7 @@ public interface UserService {
     
     Flux<KernUserRecord> findPageableUsers(Pageable pageable);
     
-    Mono<UserCreatedDto> newUser(NewUserDto user);
+    Mono<UserCreatedDto> newUser(@Valid @NonNull NewUserDto user);
     
     Mono<Long> count();
 }

@@ -2,6 +2,7 @@ package izotov.kern.iam.exception.handler;
 
 import izotov.kern.iam.exception.base.BadRequestException;
 import izotov.kern.iam.exception.base.ConflictException;
+import izotov.kern.iam.exception.base.NotFoundException;
 import izotov.kern.iam.exception.handler.response.ErrorResponse;
 import izotov.kern.iam.exception.handler.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +27,6 @@ public class GlobalExceptionHandler {
                 .map(error -> builder()
                         .code(error.getCode())
                         .field(error.getField())
-                        .rejectedValue(error.getRejectedValue())
                         .message(error.getDefaultMessage())
                         .build())
                 .toList();
@@ -55,6 +56,20 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+    
+    @ExceptionHandler({NotFoundException.class, NoResourceFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(Exception ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .code(HttpStatus.NOT_FOUND)
+                .timestamp(LocalDateTime.now())
+                .exception(ex.getClass())
+                .message(ex.getMessage())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
     

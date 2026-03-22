@@ -3,8 +3,15 @@ package izotov.kern.iam.security;
 public enum ApiPathsConstants {
     
     OPEN_API("/actuator/health",
-            "/kern/users",
-            "/kern/user/create"
+            
+            "/kern/v1/users",
+            "/kern/v1/user/create",
+            
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/webjars/**",
+            "/swagger-resources/**"
     );
     
     //AUTHENTICATED_API("/kern/users");

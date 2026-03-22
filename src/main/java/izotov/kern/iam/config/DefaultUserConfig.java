@@ -3,18 +3,13 @@ package izotov.kern.iam.config;
 import izotov.kern.iam.dao.service.RoleService;
 import izotov.kern.iam.dao.service.UserRoleService;
 import izotov.kern.iam.dao.service.UserService;
-import izotov.kern.iam.dao.entity.builder.UserBuilder;
 import izotov.kern.iam.exception.UserAlreadyExistsException;
 import izotov.kern.iam.webapi.dto.NewUserDto;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Pageable;
 
 import static izotov.kern.iam.jooq.tables.Usr.USR;
 

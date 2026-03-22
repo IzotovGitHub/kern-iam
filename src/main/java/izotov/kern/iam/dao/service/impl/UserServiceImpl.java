@@ -11,7 +11,6 @@ import izotov.kern.iam.jooq.tables.pojos.Usr;
 import izotov.kern.iam.mapper.UserMapper;
 import izotov.kern.iam.webapi.dto.NewUserDto;
 import izotov.kern.iam.webapi.dto.UserCreatedDto;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jspecify.annotations.Nullable;
@@ -32,6 +31,7 @@ import java.util.Set;
 import static org.jooq.impl.DSL.noCondition;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
     
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     }
     
     @Override
-    public Mono<UserCreatedDto> newUser(@NonNull @Validated NewUserDto user) {
+    public Mono<UserCreatedDto> newUser(NewUserDto user) {
         return exists(user.username())
                 .flatMap(exists -> exists
                         ? Mono.error(() -> new UserAlreadyExistsException(user))
