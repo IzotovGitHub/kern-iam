@@ -230,7 +230,7 @@
                         <executions>
                             <!-- Генерация кода -->
                             <execution>
-                                <phase>compile</phase>
+                                <phase>generate-sources</phase>
                                 <goals>
                                     <goal>generate</goal>
                                 </goals>
@@ -296,7 +296,6 @@
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>${dmp.version}</version>
                         <configuration>
-                            <outputFile>log/docker-env.log</outputFile>
                             <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                             <images>
                                 <image>
