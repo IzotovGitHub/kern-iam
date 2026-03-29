@@ -5,6 +5,7 @@ import izotov.kern.iam.exception.base.ConflictException;
 import izotov.kern.iam.exception.base.NotFoundException;
 import izotov.kern.iam.exception.handler.response.ErrorResponse;
 import izotov.kern.iam.exception.handler.response.ValidationErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ServerWebInputException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
@@ -47,71 +49,40 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler({BadRequestException.class, ServerWebInputException.class})
     public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .code(HttpStatus.BAD_REQUEST)
-                .timestamp(LocalDateTime.now())
-                .exception(ex.getClass())
-                .message(ex.getMessage())
-                .build();
-        
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
+        return defaultResponseEntity(HttpStatus.BAD_REQUEST, ex);
     }
     
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ErrorResponse> handleForbiddenException(AccessDeniedException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .code(HttpStatus.FORBIDDEN)
-                .timestamp(LocalDateTime.now())
-                .exception(ex.getClass())
-                .message(ex.getMessage())
-                .build();
-        
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
+        return defaultResponseEntity(HttpStatus.FORBIDDEN, ex);
     }
     
     @ExceptionHandler({NotFoundException.class, NoResourceFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .code(HttpStatus.NOT_FOUND)
-                .timestamp(LocalDateTime.now())
-                .exception(ex.getClass())
-                .message(ex.getMessage())
-                .build();
-        
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(response);
+        return defaultResponseEntity(HttpStatus.NOT_FOUND, ex);
     }
     
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
-        ErrorResponse response = ErrorResponse.builder()
-                .code(HttpStatus.CONFLICT)
-                .timestamp(LocalDateTime.now())
-                .exception(ex.getClass())
-                .message(ex.getMessage())
-                .build();
-        
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
+        return defaultResponseEntity(HttpStatus.CONFLICT, ex);
     }
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        return defaultResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex);
+    }
+    
+    private ResponseEntity<ErrorResponse> defaultResponseEntity(HttpStatus status, Exception ex) {
+        log.debug("Exception received", ex);
         ErrorResponse response = ErrorResponse.builder()
-                .code(HttpStatus.INTERNAL_SERVER_ERROR)
+                .code(status)
                 .timestamp(LocalDateTime.now())
                 .exception(ex.getClass())
                 .message(ex.getMessage())
                 .build();
         
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(status)
                 .body(response);
     }
 }
