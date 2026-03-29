@@ -47,5 +47,4 @@ logging:
     com.zaxxer.hikari: WARN
     org.springframework.jdbc: WARN
     org.springframework.boot.autoconfigure.jdbc: WARN
-    izotov.kern.iam.dao.repo: DEBUG
-    izotov.kern.iam.webapi.controller: DEBUG
+    izotov.kern.iam: DEBUG

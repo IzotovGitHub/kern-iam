@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kern</title>
+    <!-- Подключаем шрифт Inter для современного вида -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (бесплатные иконки) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* декоративный фон — абстрактные круги */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0) 70%);
+            top: 10%;
+            left: -5%;
+            border-radius: 50%;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, rgba(139,92,246,0) 70%);
+            bottom: 5%;
+            right: -8%;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        /* карточка логина */
+        .login-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 440px;
+            padding: 2.2rem 2rem 2.5rem;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 32px 55px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* шапка */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header .icon-logo {
+            background: linear-gradient(125deg, #4f46e5, #7c3aed);
+            width: 64px;
+            height: 64px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 10px 18px -5px rgba(79, 70, 229, 0.4);
+        }
+
+        .login-header .icon-logo i {
+            font-size: 2.2rem;
+            color: white;
+        }
+
+        .login-header h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .login-header p {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        /* стили формы */
+        .input-group {
+            margin-bottom: 1.4rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group label i {
+            color: #4f46e5;
+            font-size: 0.9rem;
+            width: 18px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.7rem;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1.2rem;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            color: #0f172a;
+            font-weight: 500;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* иконка внутри инпута */
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            bottom: 0.9rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .input-field:focus + .input-icon {
+            color: #4f46e5;
+        }
+
+        /* опции: запомнить и забыли пароль */
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 1.8rem;
+            font-size: 0.85rem;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .checkbox input {
+            width: 16px;
+            height: 16px;
+            accent-color: #4f46e5;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #6d28d9;
+            text-decoration: underline;
+        }
+
+        /* кнопка войти */
+        .login-btn {
+            background: linear-gradient(105deg, #4f46e5 0%, #7c3aed 100%);
+            width: 100%;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 12px rgba(79, 70, 229, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .login-btn i {
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(105deg, #6366f1 0%, #8b5cf6 100%);
+            transform: scale(1.01);
+            box-shadow: 0 12px 20px -8px rgba(79, 70, 229, 0.5);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* сообщение об ошибке / успехе */
+        .message-area {
+            margin-top: 1.2rem;
+            padding: 0.7rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s;
+            min-height: 65px;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #ef4444;
+        }
+
+        .success-msg {
+            background: #e0f2fe;
+            color: #075985;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        /* доп ссылка регистрации */
+        .register-prompt {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .register-prompt a {
+            color: #4f46e5;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .register-prompt a:hover {
+            color: #6d28d9;
+            text-decoration: underline;
+        }
+
+        /* адаптивность */
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 1.8rem 1.5rem 2rem;
+            }
+            .login-header h1 {
+                font-size: 1.6rem;
+            }
+            .input-field {
+                padding: 0.8rem 1rem 0.8rem 2.5rem;
+            }
+            .input-icon {
+                bottom: 0.8rem;
+            }
+        }
+
+        /* demo-индикация для пароля (показ/скрытие пароля) – доп. фича */
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            bottom: 0.9rem;
+            cursor: pointer;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover {
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="login-header">
+        <div class="icon-logo">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1>Добро пожаловать</h1>
+        <p>Войдите в свой аккаунт</p>
+    </div>
+
+    <!-- Форма логина -->
+    <form id="loginForm" action="#" method="post">
+        <div class="input-group">
+            <label for="username">
+                <i class="fas fa-user-circle"></i> Имя пользователя
+            </label>
+            <input type="text" id="username" name="username" class="input-field" placeholder="Ваш username" autocomplete="username" required>
+            <i class="fas fa-user input-icon"></i>
+        </div>
+
+        <div class="input-group">
+            <label for="password">
+                <i class="fas fa-key"></i> Пароль
+            </label>
+            <input type="password" id="password" name="password" class="input-field" placeholder="Введите пароль" autocomplete="current-password" required>
+            <i class="fas fa-lock input-icon"></i>
+            <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Показать/скрыть пароль">
+                <i class="far fa-eye-slash" id="toggleIcon"></i>
+            </button>
+        </div>
+
+        <div class="login-options">
+            <label class="checkbox">
+                <input type="checkbox" id="rememberCheckbox"> Запомнить меня
+            </label>
+            <a href="#" class="forgot-link" id="forgotLink">Забыли пароль?</a>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginButton">
+            <i class="fas fa-arrow-right-to-bracket"></i> Войти
+        </button>
+
+        <div id="messageBox" class="message-area"></div>
+    </form>
+
+    <div class="register-prompt">
+        Нет аккаунта? <a href="#" id="registerLink">Создать аккаунт</a>
+    </div>
+</div>
+
+<script src="/js/login.js"></script>
+</body>
+</html>

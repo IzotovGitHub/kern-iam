@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     }
     
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public Flux<KernUserRecord> findPageableUsers(Pageable pageable) {
         return findUsers(noCondition(), pageable);
     }
@@ -105,7 +107,6 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
                     return User.builder()
                             .username(user.username())
                             .password(user.password())
-                            .passwordEncoder(encoder::encode)
                             .roles(roles.toArray(new String[0]))
                             .disabled(false)
                             .build();

@@ -7,15 +7,15 @@ import izotov.kern.iam.exception.handler.response.ErrorResponse;
 import izotov.kern.iam.exception.handler.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
+import org.springframework.web.server.ServerWebInputException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static izotov.kern.iam.exception.handler.response.ValidationErrorResponse.Error.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(WebExchangeBindException ex) {
         List<ValidationErrorResponse.Error> errors = ex.getBindingResult()
                 .getFieldErrors().stream()
-                .map(error -> builder()
+                .map(error -> ValidationErrorResponse.Error.builder()
                         .code(error.getCode())
                         .field(error.getField())
                         .message(error.getDefaultMessage())
@@ -45,8 +45,8 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
     
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+    @ExceptionHandler({BadRequestException.class, ServerWebInputException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
         ErrorResponse response = ErrorResponse.builder()
                 .code(HttpStatus.BAD_REQUEST)
                 .timestamp(LocalDateTime.now())
@@ -56,6 +56,20 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+    
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ErrorResponse> handleForbiddenException(AccessDeniedException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .code(HttpStatus.FORBIDDEN)
+                .timestamp(LocalDateTime.now())
+                .exception(ex.getClass())
+                .message(ex.getMessage())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(response);
     }
     

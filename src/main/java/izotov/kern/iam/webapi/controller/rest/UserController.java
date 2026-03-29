@@ -1,4 +1,4 @@
-package izotov.kern.iam.webapi.controller;
+package izotov.kern.iam.webapi.controller.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,7 +43,7 @@ public class UserController {
             )
     )
     public Mono<Page<UserListDto>> all(@RequestParam Integer page, @RequestParam Integer size) {
-        log.debug("Request received: GET /kern/users with params: page={}, size={}", page, size);
+        log.debug("Request received: GET /kern/v1/users with params: page={}, size={}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         return userService.findPageableUsers(pageable)
                 .map(UserListDto::from)
@@ -78,7 +78,7 @@ public class UserController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<UserCreatedDto> create(@Validated @RequestBody NewUserDto newUser) {
-        log.debug("Request received: POST /kern/user/create");
+        log.debug("Request received: POST /kern/v1/user/create");
         return userService.newUser(newUser);
     }
 }

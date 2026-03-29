@@ -4,17 +4,24 @@ public enum ApiPathsConstants {
     
     OPEN_API("/actuator/health",
             
-            "/kern/v1/users",
-            "/kern/v1/user/create",
+            "/login",
+            "/kern/v1/auth/login",
             
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/webjars/**",
             "/swagger-resources/**"
-    );
+    ),
     
-    //AUTHENTICATED_API("/kern/users");
+    OPEN_RESOURCES(
+            "/static/**",
+            "/js/**",
+            "/css/**"),
+    
+    AUTHENTICATED_API(
+            "/kern/v1/users",
+            "/kern/v1/user/create");
     
     final String[] paths;
     
