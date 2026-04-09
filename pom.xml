@@ -11,11 +11,13 @@
 
     <modules>
         <module>kern</module>
-        <module>repository</module>
+        <module>exception</module>
         <module>validation</module>
+        <module>repository</module>
         <module>security</module>
         <module>service</module>
-        <module>core</module>
+        <module>webapi</module>
+
     </modules>
 
     <parent>

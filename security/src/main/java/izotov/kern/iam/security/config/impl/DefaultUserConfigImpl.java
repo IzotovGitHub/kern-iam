@@ -1,6 +1,6 @@
 package izotov.kern.iam.security.config.impl;
 
-import izotov.kern.iam.exception.UserAlreadyExistsException;
+import izotov.kern.iam.excaption.UserAlreadyExistsException;
 import izotov.kern.iam.security.config.DefaultUserConfig;
 import izotov.kern.iam.service.api.RoleService;
 import izotov.kern.iam.service.api.UserRoleService;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class DefaultUserConfigImpl implements DefaultUserConfig {
     
     

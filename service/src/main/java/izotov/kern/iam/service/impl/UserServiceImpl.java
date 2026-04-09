@@ -2,6 +2,7 @@ package izotov.kern.iam.service.impl;
 
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.Expressions;
+import izotov.kern.iam.excaption.UserAlreadyExistsException;
 import izotov.kern.iam.repository.api.UserRepository;
 import izotov.kern.iam.repository.api.record.KernUser;
 import izotov.kern.iam.service.api.UserRoleService;
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService, ReactiveUserDetailsService,
     public Mono<UserCreated> newUser(CreateUser user) {
         return exists(user.username())
                 .flatMap(exists -> exists
-                        ? Mono.error(() -> new Exception(""))
+                        ? Mono.error(() -> new UserAlreadyExistsException(user.username()))
                         : Mono.empty())
                 .then(create(user))
                 .map(created -> new UserCreated(created.id()));

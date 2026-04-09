@@ -27,6 +27,11 @@
             <artifactId>validation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>exception</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- OTHER -->
         <dependency>

@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>izotov.kern.iam</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>service</artifactId>
             <version>${project.version}</version>
         </dependency>
 
