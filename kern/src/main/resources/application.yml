@@ -1,0 +1,52 @@
+server:
+  port: 8080
+  error:
+    include-binding-errors: ALWAYS
+    include-message: ALWAYS
+    include-stacktrace: ALWAYS
+    include-exception: true
+
+spring:
+  main:
+    banner-mode: off
+  web:
+    locale: en_US
+  application:
+    name: kern-iam
+    admin:
+      username: kernadmin
+      password: changeit
+  r2dbc:
+    url: r2dbc:h2:mem:///kern_iam?options=MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: kern
+    password: kern
+    pool:
+      initial-size: 10
+      max-size: 20
+  datasource:
+    url: jdbc:h2:mem:kern_iam;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: kern
+    password: kern
+    driver-class-name: org.h2.Driver
+  liquibase:
+    enabled: true
+    change-log: /db/liquibase/scripts/master.yml
+    drop-first: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, beans
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.jooq.Constants: off
+    com.zaxxer.hikari: WARN
+    org.springframework.jdbc: WARN
+    org.springframework.boot.autoconfigure.jdbc: WARN
+    izotov.kern.iam: DEBUG
+    org.springframework.boot.context.config: TRACE

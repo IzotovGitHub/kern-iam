@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>repository</artifactId>
+        <groupId>izotov.kern.iam</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>repository.jooq-impl</artifactId>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>repository.api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen</artifactId>
+            <version>${jooq.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${dmp.version}</version>
+                <executions>
+                    <!-- Старт БД в докере для накатывания скриптов и генерации кода во время сборки проекта -->
+                    <execution>
+                        <id>postgres-start</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>postgres:17</name>
+                                    <alias>${postgres.alias}</alias>
+                                    <run>
+                                        <containerNamePattern>${postgres.alias}-build</containerNamePattern>
+                                        <env>
+                                            <POSTGRES_USER>${postgres.user}</POSTGRES_USER>
+                                            <POSTGRES_PASSWORD>${postgres.password}</POSTGRES_PASSWORD>
+                                            <POSTGRES_DB>${postgres.db}</POSTGRES_DB>
+                                        </env>
+                                        <ports>
+                                            <port>5433:5432</port>
+                                        </ports>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>10000</time>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </execution>
+                    <!-- Остановка докер контейнера с БД после сборки модуля repository -->
+                    <execution>
+                        <id>postgres-stop</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase.version}</version>
+                <executions>
+                    <!-- Применение liquibase скриптов -->
+                    <execution>
+                        <id>liquibase-update</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                        <configuration>
+                            <url>jdbc:postgresql://localhost:5433/${postgres.db}</url>
+                            <username>${postgres.user}</username>
+                            <password>${postgres.password}</password>
+                            <driver>org.postgresql.Driver</driver>
+                            <changeLogFile>../migration/src/main/resources/scripts/master.yml</changeLogFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+                <executions>
+                    <!-- Генерация кода -->
+                    <execution>
+                        <id>jooq-generation</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <logging>INFO</logging>
+                            <jdbc>
+                                <driver>org.postgresql.Driver</driver>
+                                <url>jdbc:postgresql://localhost:5433/${postgres.db}</url>
+                                <user>${postgres.user}</user>
+                                <password>${postgres.password}</password>
+                            </jdbc>
+                            <generator>
+                                <name>org.jooq.codegen.JavaGenerator</name>
+                                <database>
+                                    <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                                    <includes>.*</includes>
+                                    <inputSchema>kerniam</inputSchema>
+                                </database>
+
+                                <generate>
+                                    <pojos>true</pojos>
+                                </generate>
+                                <target>
+                                    <packageName>izotov.kern.iam.repository.jooq.codegen</packageName>
+                                    <directory>${basedir}/src/main/java</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
