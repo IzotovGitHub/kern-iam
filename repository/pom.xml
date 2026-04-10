@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-       <!-- <module>migration</module>-->
+        <module>migration</module>
         <module>api</module>
         <module>jooq-impl</module>
     </modules>

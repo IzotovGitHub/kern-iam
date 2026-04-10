@@ -28,6 +28,8 @@ spring:
     username: kern
     password: kern
     driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 10
   liquibase:
     enabled: true
     change-log: ../repository/migration/src/main/resources/scripts/master.yml

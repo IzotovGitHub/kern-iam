@@ -73,6 +73,12 @@
         <dependencies>
             <dependency>
                 <groupId>izotov.kern.iam</groupId>
+                <artifactId>repository.mirgation</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>izotov.kern.iam</groupId>
                 <artifactId>exception</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>

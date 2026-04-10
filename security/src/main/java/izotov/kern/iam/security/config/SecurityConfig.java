@@ -1,4 +1,4 @@
-package izotov.kern.iam.security.config.impl;
+package izotov.kern.iam.security.config;
 
 import izotov.kern.iam.webapi.ApiPathsConstants;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,7 +19,6 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
-
 
 @Configuration
 @EnableWebFluxSecurity

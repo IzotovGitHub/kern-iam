@@ -23,6 +23,10 @@
 
         <dependency>
             <groupId>izotov.kern.iam</groupId>
+            <artifactId>repository.mirgation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
             <artifactId>exception</artifactId>
         </dependency>
         <dependency>

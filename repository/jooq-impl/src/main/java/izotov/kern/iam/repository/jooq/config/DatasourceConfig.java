@@ -1,11 +1,16 @@
 package izotov.kern.iam.repository.jooq.config;
 
+import io.r2dbc.spi.ConnectionFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.transaction.ReactiveTransactionManager;
 
-import izotov.kern.iam.repository.jooq.poperties.JDBCProperties;
+@Configuration
+public class DatasourceConfig {
 
-public interface DatasourceConfig {
-    
-    void setJdbcProperties(JDBCProperties jdbcProperties);
-    
-    JDBCProperties getJdbcProperties();
+    @Bean
+    public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+        return new R2dbcTransactionManager(connectionFactory);
+    }
 }
