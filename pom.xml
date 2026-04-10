@@ -26,7 +26,8 @@
     </parent>
 
     <properties>
-        <spring-boot.run.main-class>izotov.kern.iam.KernIdentityAndAccessManagementApplication</spring-boot.run.main-class>
+        <spring-boot.run.main-class>izotov.kern.iam.KernIdentityAndAccessManagementApplication
+        </spring-boot.run.main-class>
         <application.alias>kern-iam-application</application.alias>
 
         <postgres.user>kern</postgres.user>
@@ -114,12 +115,17 @@
                 <version>2.2.43</version>
                 <scope>compile</scope>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
                 <version>${spring-security.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${spring-security.version}</version>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

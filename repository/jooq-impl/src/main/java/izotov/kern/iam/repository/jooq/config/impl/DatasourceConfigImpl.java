@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
 import org.springframework.transaction.ReactiveTransactionManager;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class DatasourceConfigImpl implements DatasourceConfig {
     
     private JDBCProperties jdbcProperties;
