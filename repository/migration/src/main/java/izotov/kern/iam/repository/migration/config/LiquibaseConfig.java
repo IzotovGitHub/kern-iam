@@ -37,9 +37,9 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    public SpringLiquibase liquibase(@Qualifier("jdbcDataSource") DataSource dataSource) {
+    public SpringLiquibase liquibase() {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
+        liquibase.setDataSource(jdbcDataSource());
         liquibase.setShouldRun(liquibaseProperties.isEnabled());
         liquibase.setChangeLog(liquibaseProperties.getChangeLog());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());
