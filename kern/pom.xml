@@ -18,6 +18,31 @@
     <dependencies>
         <dependency>
             <groupId>izotov.kern.iam</groupId>
+            <artifactId>exception</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>repository.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>repository.jooq-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
+            <artifactId>webapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>izotov.kern.iam</groupId>
             <artifactId>security</artifactId>
             <version>${project.version}</version>
         </dependency>

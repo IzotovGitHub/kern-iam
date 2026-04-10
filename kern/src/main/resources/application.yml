@@ -1,16 +1,16 @@
 server:
   port: 8080
-  error:
-    include-binding-errors: ALWAYS
-    include-message: ALWAYS
-    include-stacktrace: ALWAYS
-    include-exception: true
 
 spring:
   main:
     banner-mode: off
   web:
     locale: en_US
+    error:
+      include-binding-errors: ALWAYS
+      include-message: ALWAYS
+      include-stacktrace: ALWAYS
+      include-exception: true
   application:
     name: kern-iam
     admin:
@@ -30,7 +30,7 @@ spring:
     driver-class-name: org.h2.Driver
   liquibase:
     enabled: true
-    change-log: /db/liquibase/scripts/master.yml
+    change-log: ../repository/migration/src/main/resources/scripts/master.yml
     drop-first: false
 
 management:
@@ -49,4 +49,5 @@ logging:
     org.springframework.jdbc: WARN
     org.springframework.boot.autoconfigure.jdbc: WARN
     izotov.kern.iam: DEBUG
-    org.springframework.boot.context.config: TRACE
+    org.springframework.beans: DEBUG
+    org.springframework.boot.context.config: DEBUG

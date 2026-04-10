@@ -1,4 +1,4 @@
-package izotov.kern.iam.security;
+package izotov.kern.iam.webapi;
 
 public enum ApiPathsConstants {
     

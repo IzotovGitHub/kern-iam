@@ -14,16 +14,15 @@
         <module>exception</module>
         <module>validation</module>
         <module>repository</module>
-        <module>security</module>
         <module>service</module>
         <module>webapi</module>
-
+        <module>security</module>
     </modules>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.5</version>
     </parent>
 
     <properties>
@@ -72,6 +71,37 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>izotov.kern.iam</groupId>
+                <artifactId>exception</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>izotov.kern.iam</groupId>
+                <artifactId>validation</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>izotov.kern.iam</groupId>
+                <artifactId>repository.api</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>izotov.kern.iam</groupId>
+                <artifactId>webapi</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>izotov.kern.iam</groupId>
+                <artifactId>service</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -83,6 +113,13 @@
                 <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>2.2.43</version>
                 <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${spring-security.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

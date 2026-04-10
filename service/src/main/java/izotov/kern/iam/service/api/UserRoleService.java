@@ -1,14 +1,13 @@
 package izotov.kern.iam.service.api;
 
-import izotov.kern.iam.repository.api.record.KernUser;
-import izotov.kern.iam.repository.api.record.Role;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
+import java.util.UUID;
 
 public interface UserRoleService {
-    
-    Mono<Void> assign(KernUser user, Role role);
-    
-    Mono<Set<String>> findUserRoles(KernUser user);
+
+    Mono<Void> assign(UUID userId, String role);
+
+    Mono<Set<String>> findUserRoles(UUID userId);
 }
